@@ -282,10 +282,12 @@ def progress_panel():
         try:
             st.session_state.result = job.future.result()
         except Exception as exc:
+            import traceback
+            traceback.print_exc()
             if type(exc).__name__ == "ProviderFailure" or isinstance(exc, ValueError):
                 st.session_state.job_error = str(exc)
             else:
-                st.session_state.job_error = "We could not complete this request. Please try again or contact the app owner."
+                st.session_state.job_error = f"{type(exc).__name__}: {str(exc)}"
         st.session_state.job = None
         st.rerun()
 
