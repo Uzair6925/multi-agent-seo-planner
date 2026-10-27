@@ -13,3 +13,5 @@ groq
 openai
 httpx
 reportlab
+fpdf2>=2.7.0
+uharfbuzz>=0.30.0

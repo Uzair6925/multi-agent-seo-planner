@@ -44,48 +44,70 @@ def content_markdown(result):
 
 
 def download_markdown(result):
-    report = result.get("article") or result["brief"]
+    report = result.get("article") or result.get("brief", {})
     parts = [content_markdown(result), "---", "## SEO details",
-             "Meta description: " + report["meta_description"],
-             "Suggested keywords: " + ", ".join(result["brief"]["suggested_keywords"]),
-             "## Review and limitations", STATUS_LABELS[result["status"]],
+             "Meta description: " + str(report.get("meta_description") or result.get("seo", {}).get("intent_reason") or "N/A"),
+             "Suggested keywords: " + ", ".join(result.get("brief", {}).get("suggested_keywords", [])),
+             "## Review and limitations", STATUS_LABELS.get(result.get("status"), "Draft"),
              "Automated review checks supplied evidence; it is not independent fact checking."]
-    parts.extend("- " + n for n in dict.fromkeys(result["notices"] + result["brief"]["limitations"]))
-    for target, review in result["review"].items():
-        parts.extend(f"- {target}: {issue['required_change']}" for issue in review.get("issues", []))
+    parts.extend("- " + n for n in dict.fromkeys(result.get("notices", []) + result.get("brief", {}).get("limitations", [])))
+    for target, review in (result.get("review") or {}).items():
+        parts.extend(f"- {target}: {issue.get('required_change', '')}" for issue in review.get("issues", []))
     parts.append("## References")
-    if not result["sources"]:
+    if not result.get("sources"):
         parts.append("No external references were retrieved.")
-    for sid, source in result["sources"].items():
+    for sid, source in (result.get("sources") or {}).items():
         title = source.get("title", "Reference")
         parts.append(f"- {sid}: {title}" + (f" — {source['url']}" if source.get("url") else " (uploaded document)"))
     return safe_markdown("\n\n".join(parts))
 
 
 def make_pdf(result):
-    from fpdf import FPDF
+    try:
+        from fpdf import FPDF
+    except ImportError:
+        raise RuntimeError("fpdf2 library is required for PDF generation.")
     fonts = Path(__file__).resolve().parents[1] / "assets" / "fonts"
 
     class Document(FPDF):
         def footer(self):
             self.set_y(-14)
-            self.set_font("Noto", size=8)
+            try:
+                self.set_font("Noto", size=8)
+            except Exception:
+                self.set_font("helvetica", size=8)
             self.set_text_color(110, 120, 135)
             self.cell(0, 6, f"SEO Content Planner  |  {self.page_no()}", align="C")
 
     pdf = Document()
     pdf.set_margins(20, 20, 20)
     pdf.set_auto_page_break(True, margin=22)
-    pdf.add_font("Noto", fname=str(fonts / "NotoSans-Regular.ttf"))
-    pdf.add_font("Noto", style="B", fname=str(fonts / "NotoSans-Bold.ttf"))
-    pdf.add_font("Arabic", fname=str(fonts / "NotoNaskhArabic-Regular.ttf"))
-    pdf.set_fallback_fonts(["Arabic"], exact_match=False)
+    has_noto = (fonts / "NotoSans-Regular.ttf").exists()
+    has_arabic = (fonts / "NotoNaskhArabic-Regular.ttf").exists()
+    if has_noto:
+        try:
+            pdf.add_font("Noto", fname=str(fonts / "NotoSans-Regular.ttf"))
+            if (fonts / "NotoSans-Bold.ttf").exists():
+                pdf.add_font("Noto", style="B", fname=str(fonts / "NotoSans-Bold.ttf"))
+        except Exception:
+            has_noto = False
+    if has_arabic:
+        try:
+            pdf.add_font("Arabic", fname=str(fonts / "NotoNaskhArabic-Regular.ttf"))
+            if has_noto:
+                pdf.set_fallback_fonts(["Arabic"], exact_match=False)
+        except Exception:
+            has_arabic = False
     try:
         pdf.set_text_shaping(True)
     except Exception:
         pass
     pdf.add_page()
-    pdf.set_title((result.get("article") or result["brief"])["title"])
+    title = (result.get("article") or result.get("brief", {})).get("title", "SEO Content")
+    try:
+        pdf.set_title(title)
+    except Exception:
+        pass
     for line in download_markdown(result).splitlines():
         if not line.strip():
             pdf.ln(2)
@@ -99,7 +121,12 @@ def make_pdf(result):
         text = re.sub(r"[\u2010-\u2014]", "-", text)
         arabic = bool(re.search(r"[\u0600-\u06ff]", text))
         size = {1: 21, 2: 14, 3: 11}.get(heading, 10)
-        pdf.set_font("Arabic" if arabic else "Noto", style="B" if heading and not arabic else "", size=size)
+        font_name = "Arabic" if (arabic and has_arabic) else ("Noto" if has_noto else "helvetica")
+        font_style = "B" if heading and not arabic else ""
+        try:
+            pdf.set_font(font_name, style=font_style, size=size)
+        except Exception:
+            pdf.set_font("helvetica", style=font_style, size=size)
         pdf.set_text_color(*( (35, 52, 82) if heading else (40, 45, 55)))
         if heading:
             if pdf.will_page_break(24):

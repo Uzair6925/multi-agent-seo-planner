@@ -376,8 +376,8 @@ def show_results(result):
             try:
                 st.session_state.pdf = make_pdf(result)
                 st.rerun()
-            except Exception:
-                st.error("PDF export is temporarily unavailable. You can still download Markdown.")
+            except Exception as e:
+                st.error(f"PDF export is temporarily unavailable ({e}). You can still download Markdown.")
     else:
         one.download_button("Download PDF", st.session_state.pdf, "seo-content.pdf", "application/pdf", use_container_width=True)
     two.download_button("Download Markdown", download_markdown(result), "seo-content.md", "text/markdown", use_container_width=True)
