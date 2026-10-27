@@ -87,7 +87,8 @@ def active_providers():
     if groq_key:
         providers.append({"label": "Groq (gpt-oss-20b) ", "id": "groq", "key": groq_key})
     if cerebras_key:
-        providers.append({"label": "Cerebras (gpt-oss-120b)", "id": "cerebras", "key": cerebras_key})
+        providers.append({"label": "Cerebras (qwen-3.8-27b - Fast ⚡)", "id": "cerebras-fast", "key": cerebras_key})
+        providers.append({"label": "Cerebras (gpt-oss-120b - Deep)", "id": "cerebras", "key": cerebras_key})
     return providers
 
 

@@ -163,18 +163,18 @@ class JSONTransport(BaseLLM):
 
 
 STAGE_TOKENS = {
-    "intake": 500,
-    "source": 600,
-    "audience": 800,
-    "seo": 800,
-    "research": 1000,
-    "structure": 1500,
+    "intake": 400,
+    "source": 500,
+    "audience": 600,
+    "seo": 600,
+    "research": 800,
+    "structure": 1200,
     "writer": 1800,
-    "review_research": 600,
-    "review_seo": 600,
-    "review_brief": 1200,
-    "review_unified": 1500,
-    "review_article": 1000,
+    "review_research": 500,
+    "review_seo": 500,
+    "review_brief": 900,
+    "review_unified": 1000,
+    "review_article": 800,
 }
 
 
@@ -186,8 +186,8 @@ class StageRunner:
         if not provider:
             if api_key.startswith("gsk_") or os.getenv("LLM_PROVIDER") == "groq":
                 provider = "groq"
-            elif api_key.startswith("csk-") or os.getenv("LLM_PROVIDER") == "cerebras":
-                provider = "cerebras"
+            elif api_key.startswith("csk-") or os.getenv("LLM_PROVIDER") in ("cerebras", "cerebras-fast"):
+                provider = "cerebras-fast"
             elif api_key.startswith("AIza") or api_key.startswith("AQ.") or os.getenv("LLM_PROVIDER") == "gemini":
                 provider = "gemini"
             else:
@@ -207,9 +207,10 @@ class StageRunner:
                 base_url="https://generativelanguage.googleapis.com/v1beta/openai/",
                 http_client=self.http_client
             )
-        elif self.provider == "cerebras":
+        elif self.provider in ("cerebras", "cerebras-fast"):
             from openai import OpenAI
-            self.model = os.getenv("CEREBRAS_MODEL", "gpt-oss-120b")
+            default_m = "qwen-3.8-27b" if self.provider == "cerebras-fast" else "gpt-oss-120b"
+            self.model = os.getenv("CEREBRAS_MODEL", default_m)
             self.client = OpenAI(
                 api_key=api_key,
                 base_url="https://api.cerebras.ai/v1",
@@ -234,8 +235,8 @@ class StageRunner:
             if self.last_call > 0:
                 if self.provider == "gemini":
                     min_gap = 0.5
-                elif self.provider == "cerebras":
-                    min_gap = 0.2
+                elif "cerebras" in self.provider:
+                    min_gap = 0.1
                 else:
                     min_gap = 2.0 if name == "writer" else 1.0
                 elapsed = time.monotonic() - self.last_call
