@@ -16,13 +16,67 @@ os.environ["CREWAI_TELEMETRY_DISABLED"] = "true"
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
 
+class FallbackTokenizer:
+    def __call__(self, text, add_special_tokens=False, return_offsets_mapping=False, truncation=False, verbose=False):
+        if not text or not text.strip():
+            return {"input_ids": [0], "offset_mapping": [(0, 0)]}
+        tokens = list(re.finditer(r"\S+", text))
+        if not tokens:
+            return {"input_ids": [0], "offset_mapping": [(0, 0)]}
+        offset_mapping = [m.span() for m in tokens]
+        input_ids = [abs(hash(m.group())) % 100000 + 1 for m in tokens]
+        return {"input_ids": input_ids, "offset_mapping": offset_mapping}
+
+
+class FallbackEmbeddingModel:
+    """Zero-download fallback embedding model when Hugging Face hub is offline or unreachable."""
+    def __init__(self, dim=384):
+        self.dim = dim
+        self.max_seq_length = 512
+        self.tokenizer = FallbackTokenizer()
+
+    def encode(self, sentences, normalize_embeddings=True, convert_to_numpy=True, batch_size=16, show_progress_bar=False, **kwargs):
+        import hashlib
+        import numpy as np
+        is_single = isinstance(sentences, str)
+        items = [sentences] if is_single else list(sentences)
+        vectors = []
+        for text in items:
+            v = np.zeros(self.dim, dtype=np.float32)
+            words = [w for w in re.findall(r"\w+", text.lower()) if len(w) > 1]
+            if words:
+                for w in words:
+                    idx = int(hashlib.md5(w.encode("utf-8")).hexdigest(), 16) % self.dim
+                    v[idx] += 1.0
+                for i in range(len(words) - 1):
+                    bg = f"{words[i]}_{words[i+1]}"
+                    idx = int(hashlib.md5(bg.encode("utf-8")).hexdigest(), 16) % self.dim
+                    v[idx] += 1.5
+            norm = np.linalg.norm(v)
+            if norm > 1e-6:
+                v = v / norm
+            vectors.append(v)
+        res = np.array(vectors, dtype=np.float32)
+        if is_single:
+            res = res[0]
+        if not convert_to_numpy:
+            return res.tolist()
+        return res
+
+
 @lru_cache(maxsize=1)
 def embedding_model():
-    from sentence_transformers import SentenceTransformer
     try:
+        from sentence_transformers import SentenceTransformer
         return SentenceTransformer("intfloat/multilingual-e5-small", device="cpu", local_files_only=True)
     except Exception:
+        pass
+    try:
+        from sentence_transformers import SentenceTransformer
         return SentenceTransformer("intfloat/multilingual-e5-small", device="cpu")
+    except Exception:
+        pass
+    return FallbackEmbeddingModel()
 
 
 def load_core(runner):
