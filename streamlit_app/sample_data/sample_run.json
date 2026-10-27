@@ -1,0 +1,498 @@
+{
+  "topic": "Machine Learning course for beginners",
+  "audience": "University students in Pakistan starting their AI journey",
+  "status": "passed_supplied_evidence_review",
+  "run_directory": "/kaggle/working/seo_planner/20261021_185359_9b63fa80",
+  "brief": {
+    "title": "A Practical Roadmap for Pakistani University Students to Learn Machine Learning from Scratch",
+    "meta_description": "A step-by-step guide for Pakistani university students starting their AI journey, covering essential math and Python skills, project-based learning, and clear career pathways in machine learning.",
+    "suggested_keywords": [
+      "Machine Learning course for beginners",
+      "Python for Machine Learning",
+      "Fundamental math for AI",
+      "Project-based ML learning",
+      "career paths in AI Pakistan"
+    ],
+    "search_intent": "informational",
+    "h1": "Getting Started with Machine Learning: A Beginner's Guide for Pakistani University Students",
+    "outline": [
+      {
+        "h2": "Foundational Skills: Math and Python Basics",
+        "h3": [
+          "Linear Algebra Overview",
+          "Probability and Statistics Basics",
+          "Python Programming Essentials"
+        ],
+        "coverage_notes": [
+          "Explain why linear algebra and probability are core to ML.",
+          "Highlight free resources like Khan Academy and Coursera for math.",
+          "Show how to set up a Python environment and use Jupyter notebooks."
+        ],
+        "chunk_ids": []
+      },
+      {
+        "h2": "Choosing the Right Learning Path",
+        "h3": [
+          "Live Interactive Courses",
+          "Self-Study Options",
+          "Hybrid Models"
+        ],
+        "coverage_notes": [
+          "Compare live courses with self-study for flexibility.",
+          "Mention Pakistan AI Online Academy's beginner course that requires no prior coding (S1-C9).",
+          "Discuss Nizi Solutions' live online training with certification and job placement support (S3-C7)."
+        ],
+        "chunk_ids": [
+          "S1-C9",
+          "S3-C7"
+        ]
+      },
+      {
+        "h2": "Hands-On Projects to Build a Portfolio",
+        "h3": [
+          "Project Ideas for Beginners",
+          "Project Workflow",
+          "Showcasing Your Work"
+        ],
+        "coverage_notes": [
+          "Provide concrete project ideas such as customer churn prediction or healthcare data analysis.",
+          "Explain the steps from data collection to model deployment.",
+          "Show how to document and share projects on GitHub or personal websites."
+        ],
+        "chunk_ids": [
+          "S1-C8"
+        ]
+      },
+      {
+        "h2": "Career Pathways in AI for Pakistani Students",
+        "h3": [
+          "Entry-Level Roles",
+          "Industry Demand",
+          "Further Specialization"
+        ],
+        "coverage_notes": [
+          "Outline roles like Data Analyst, Junior ML Engineer, and AI Research Assistant.",
+          "Discuss the growing AI industry in Pakistan and job prospects.",
+          "Suggest next steps for advanced learning and certifications."
+        ],
+        "chunk_ids": []
+      },
+      {
+        "h2": "Free and Affordable Resources",
+        "h3": [
+          "Online Courses",
+          "MOOCs",
+          "Community Groups"
+        ],
+        "coverage_notes": [
+          "List free platforms such as Coursera, edX, and YouTube tutorials.",
+          "Mention local community meetups and hackathons.",
+          "Highlight the importance of continuous learning."
+        ],
+        "chunk_ids": []
+      }
+    ],
+    "faqs": [
+      "What math topics should I master before starting machine learning?",
+      "How can I apply what I learn in real-world projects?",
+      "What are the most in-demand AI roles in Pakistan?",
+      "Where can I find affordable or free learning resources?",
+      "Does the Pakistan AI Online Academy offer certification?"
+    ],
+    "limitations": [
+      "Supplied evidence has not been independently fact-checked."
+    ],
+    "output_language": "English"
+  },
+  "reviews": {
+    "research": {
+      "checked_locations": [
+        "findings[0].statement",
+        "findings[1].statement",
+        "findings[2].statement",
+        "missing_information"
+      ],
+      "assessments": [
+        {
+          "location": "findings[0].statement",
+          "verdict": "supported",
+          "explanation": "The claim that the Pakistan AI Online Academy's Beginner AI Course requires no prior coding or technical experience is directly supported by the excerpt from S1-C9:E2, which states \"No prior coding or technical experience is required.\"",
+          "citations": [
+            {
+              "chunk_id": "S1-C9",
+              "quote": "Our courses are designed for students aged 10 and above, school students, college students, and complete beginners. No prior coding or technical experience is required."
+            }
+          ]
+        },
+        {
+          "location": "findings[1].statement",
+          "verdict": "supported",
+          "explanation": "The statement that Nizi Solutions offers live online classes, a certification, and job placement support is corroborated by S3-C7:E1, which mentions \"You'll receive a Nizi Solutions certification recognized by industry partners\" and \"We offer career counseling, resume reviews, and job referrals in Pakistan's AI/ML industry.\"",
+          "citations": [
+            {
+              "chunk_id": "S3-C7",
+              "quote": "You'll receive a Nizi Solutions certification recognized by industry partners. We offer career counseling, resume reviews, and job referrals in Pakistan's AI/ML industry."
+            }
+          ]
+        },
+        {
+          "location": "findings[2].statement",
+          "verdict": "supported",
+          "explanation": "Both providers emphasize project-based learning. The excerpt from S1-C8:E3 states \"Portfolio Building Build multiple functional projects that showcase your skills to universities or clients,\" and also notes live online interaction.",
+          "citations": [
+            {
+              "chunk_id": "S1-C8",
+              "quote": "Portfolio Building Build multiple functional projects that showcase your skills to universities or clients. Live Classes Interact with instructors, share screens, and clear queries in real-time."
+            }
+          ]
+        },
+        {
+          "location": "missing_information",
+          "verdict": "editorial",
+          "explanation": "No factual claim is made in this unit; it simply indicates that information is missing. No evidence is required.",
+          "citations": []
+        }
+      ],
+      "issues": [],
+      "limitations": [
+        "Supplied evidence has not been independently fact-checked."
+      ]
+    },
+    "seo": {
+      "checked_locations": [
+        "primary_keyword",
+        "secondary_keywords",
+        "long_tail_keywords",
+        "search_intent"
+      ],
+      "assessments": [
+        {
+          "location": "primary_keyword",
+          "verdict": "editorial",
+          "explanation": "The primary keyword is a descriptive phrase for the article topic and does not assert any factual claim.",
+          "citations": []
+        },
+        {
+          "location": "secondary_keywords",
+          "verdict": "editorial",
+          "explanation": "Secondary keywords are a list of relevant search terms; they are editorial guidance and not factual claims.",
+          "citations": []
+        },
+        {
+          "location": "long_tail_keywords",
+          "verdict": "editorial",
+          "explanation": "Long-tail keywords are descriptive search terms; they do not contain factual claims and are editorial.",
+          "citations": []
+        },
+        {
+          "location": "search_intent",
+          "verdict": "editorial",
+          "explanation": "Search intent is an editorial classification of user intent, not a factual claim.",
+          "citations": []
+        }
+      ],
+      "issues": [],
+      "limitations": [
+        "Supplied evidence has not been independently fact-checked."
+      ]
+    },
+    "brief": {
+      "checked_locations": [
+        "title",
+        "meta_description",
+        "h1",
+        "suggested_keywords",
+        "outline[0].h2",
+        "outline[0].h3",
+        "outline[0].coverage[0]",
+        "outline[0].coverage[1]",
+        "outline[0].coverage[2]",
+        "outline[1].h2",
+        "outline[1].h3",
+        "outline[1].coverage[0]",
+        "outline[1].coverage[1]",
+        "outline[1].coverage[2]",
+        "outline[2].h2",
+        "outline[2].h3",
+        "outline[2].coverage[0]",
+        "outline[2].coverage[1]",
+        "outline[2].coverage[2]",
+        "outline[3].h2",
+        "outline[3].h3",
+        "outline[3].coverage[0]",
+        "outline[3].coverage[1]",
+        "outline[3].coverage[2]",
+        "outline[4].h2",
+        "outline[4].h3",
+        "outline[4].coverage[0]",
+        "outline[4].coverage[1]",
+        "outline[4].coverage[2]",
+        "faqs[0]",
+        "faqs[1]",
+        "faqs[2]",
+        "faqs[3]",
+        "faqs[4]"
+      ],
+      "assessments": [
+        {
+          "location": "title",
+          "verdict": "editorial",
+          "explanation": "Title is original editorial guidance.",
+          "citations": []
+        },
+        {
+          "location": "meta_description",
+          "verdict": "editorial",
+          "explanation": "Meta description provides editorial overview, no empirical claims.",
+          "citations": []
+        },
+        {
+          "location": "h1",
+          "verdict": "editorial",
+          "explanation": "H1 is editorial heading.",
+          "citations": []
+        },
+        {
+          "location": "suggested_keywords",
+          "verdict": "editorial",
+          "explanation": "Keyword list is strategic search phrase collection, marked editorial.",
+          "citations": []
+        },
+        {
+          "location": "outline[0].h2",
+          "verdict": "editorial",
+          "explanation": "Section heading is editorial.",
+          "citations": []
+        },
+        {
+          "location": "outline[0].h3",
+          "verdict": "editorial",
+          "explanation": "Subheadings are editorial.",
+          "citations": []
+        },
+        {
+          "location": "outline[0].coverage[0]",
+          "verdict": "editorial",
+          "explanation": "Explanation of why linear algebra is core is educational guidance.",
+          "citations": []
+        },
+        {
+          "location": "outline[0].coverage[1]",
+          "verdict": "editorial",
+          "explanation": "Listing free resources is educational recommendation.",
+          "citations": []
+        },
+        {
+          "location": "outline[0].coverage[2]",
+          "verdict": "editorial",
+          "explanation": "Setting up Python environment is standard tutorial guidance.",
+          "citations": []
+        },
+        {
+          "location": "outline[1].h2",
+          "verdict": "editorial",
+          "explanation": "Section heading is editorial.",
+          "citations": []
+        },
+        {
+          "location": "outline[1].h3",
+          "verdict": "editorial",
+          "explanation": "Subheadings are editorial.",
+          "citations": []
+        },
+        {
+          "location": "outline[1].coverage[0]",
+          "verdict": "editorial",
+          "explanation": "Comparison of live vs self-study is editorial guidance.",
+          "citations": []
+        },
+        {
+          "location": "outline[1].coverage[1]",
+          "verdict": "supported",
+          "explanation": "Claim that Pakistan AI Online Academy's beginner course requires no prior coding is supported by evidence S1-C9.",
+          "citations": [
+            {
+              "chunk_id": "S1-C9",
+              "quote": "No prior coding or technical experience is required. Whether you are a parent looking for future-ready skills for your child or a student wanting to learn AI, our courses are perfect for you."
+            }
+          ]
+        },
+        {
+          "location": "outline[1].coverage[2]",
+          "verdict": "supported",
+          "explanation": "Claim that Nizi Solutions offers live online training with certification and job placement support is supported by evidence S3-C7.",
+          "citations": [
+            {
+              "chunk_id": "S3-C7",
+              "quote": "You'll receive a Nizi Solutions certification recognized by industry partners. We offer career counseling, resume reviews, and job referrals in Pakistan's AI/ML industry."
+            }
+          ]
+        },
+        {
+          "location": "outline[2].h2",
+          "verdict": "editorial",
+          "explanation": "Heading is editorial.",
+          "citations": []
+        },
+        {
+          "location": "outline[2].h3",
+          "verdict": "editorial",
+          "explanation": "Subheadings are editorial.",
+          "citations": []
+        },
+        {
+          "location": "outline[2].coverage[0]",
+          "verdict": "editorial",
+          "explanation": "Project ideas are editorial recommendations.",
+          "citations": []
+        },
+        {
+          "location": "outline[2].coverage[1]",
+          "verdict": "editorial",
+          "explanation": "Workflow steps from data collection to deployment are tutorial guidance.",
+          "citations": []
+        },
+        {
+          "location": "outline[2].coverage[2]",
+          "verdict": "editorial",
+          "explanation": "GitHub sharing guidance is editorial portfolio advice.",
+          "citations": []
+        },
+        {
+          "location": "outline[3].h2",
+          "verdict": "editorial",
+          "explanation": "Heading is editorial.",
+          "citations": []
+        },
+        {
+          "location": "outline[3].h3",
+          "verdict": "editorial",
+          "explanation": "Subheadings are editorial.",
+          "citations": []
+        },
+        {
+          "location": "outline[3].coverage[0]",
+          "verdict": "editorial",
+          "explanation": "Role descriptions are industry guidance.",
+          "citations": []
+        },
+        {
+          "location": "outline[3].coverage[1]",
+          "verdict": "editorial",
+          "explanation": "Industry demand discussion is general market advice.",
+          "citations": []
+        },
+        {
+          "location": "outline[3].coverage[2]",
+          "verdict": "editorial",
+          "explanation": "Advanced learning suggestions are editorial guidance.",
+          "citations": []
+        },
+        {
+          "location": "outline[4].h2",
+          "verdict": "editorial",
+          "explanation": "Heading is editorial.",
+          "citations": []
+        },
+        {
+          "location": "outline[4].h3",
+          "verdict": "editorial",
+          "explanation": "Subheadings are editorial.",
+          "citations": []
+        },
+        {
+          "location": "outline[4].coverage[0]",
+          "verdict": "editorial",
+          "explanation": "Listing free platforms is editorial recommendations.",
+          "citations": []
+        },
+        {
+          "location": "outline[4].coverage[1]",
+          "verdict": "editorial",
+          "explanation": "Mention of community meetups is editorial.",
+          "citations": []
+        },
+        {
+          "location": "outline[4].coverage[2]",
+          "verdict": "editorial",
+          "explanation": "Continuous learning importance is editorial advice.",
+          "citations": []
+        },
+        {
+          "location": "faqs[0]",
+          "verdict": "editorial",
+          "explanation": "FAQ is editorial question.",
+          "citations": []
+        },
+        {
+          "location": "faqs[1]",
+          "verdict": "editorial",
+          "explanation": "FAQ is editorial question.",
+          "citations": []
+        },
+        {
+          "location": "faqs[2]",
+          "verdict": "editorial",
+          "explanation": "FAQ is editorial question.",
+          "citations": []
+        },
+        {
+          "location": "faqs[3]",
+          "verdict": "editorial",
+          "explanation": "FAQ is editorial question.",
+          "citations": []
+        },
+        {
+          "location": "faqs[4]",
+          "verdict": "editorial",
+          "explanation": "FAQ is editorial question.",
+          "citations": []
+        }
+      ],
+      "issues": [],
+      "limitations": [
+        "Supplied evidence has not been independently fact-checked."
+      ]
+    }
+  },
+  "sources": [
+    {
+      "source_id": "S1",
+      "title": "Pakistan AI Online Academy - Practical Hands-on AI Courses",
+      "url": "https://pakistan-ai-academy.example.com",
+      "source_role": "external_reference"
+    },
+    {
+      "source_id": "S2",
+      "title": "Machine Learning Prerequisites and Educational Guide",
+      "url": "https://ml-guide.example.org",
+      "source_role": "external_reference"
+    },
+    {
+      "source_id": "S3",
+      "title": "Nizi Solutions - AI Training and Industry Certification",
+      "url": "https://nizisolutions.example.com",
+      "source_role": "external_reference"
+    }
+  ],
+  "evidence": [
+    {
+      "chunk_id": "S1-C8",
+      "source_title": "Pakistan AI Online Academy",
+      "source_url": "https://pakistan-ai-academy.example.com",
+      "text": "Live Classes Interact with instructors, share screens, and clear queries in real-time. Portfolio Building Build multiple functional projects that showcase your skills to universities or clients. WhatsApp Support Clear doubts outside class."
+    },
+    {
+      "chunk_id": "S1-C9",
+      "source_title": "Pakistan AI Online Academy",
+      "source_url": "https://pakistan-ai-academy.example.com",
+      "text": "Our courses are designed for students aged 10 and above, school students, college students, and complete beginners. No prior coding or technical experience is required. Our Beginner AI Course is specifically designed for students with zero technical background."
+    },
+    {
+      "chunk_id": "S3-C7",
+      "source_title": "Nizi Solutions AI Training",
+      "source_url": "https://nizisolutions.example.com",
+      "text": "You'll receive a Nizi Solutions certification recognized by industry partners. We offer career counseling, resume reviews, and job referrals in Pakistan's AI/ML industry. We provide live online training with the same curriculum."
+    }
+  ]
+}

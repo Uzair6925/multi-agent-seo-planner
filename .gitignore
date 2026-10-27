@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+.venv
+
+# Secrets & Environment variables (NEVER COMMIT)
+.env
+.env.*
+*.key
+*.pem
+
+# Streamlit local state
+.streamlit/secrets.toml
+.localappdata/
+
+# Testing & Cache
+.pytest_cache/
+.coverage
+htmlcov/
+
+# OS files
+.DS_Store
+Thumbs.db
+

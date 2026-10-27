@@ -1,0 +1,15 @@
+streamlit>=1.30.0
+crewai>=0.100.0
+pydantic>=2.0
+sentence-transformers>=2.2.0
+torch
+duckduckgo-search>=6.0.0
+beautifulsoup4
+pypdf
+openpyxl
+python-pptx
+python-dotenv
+groq
+openai
+httpx
+reportlab
