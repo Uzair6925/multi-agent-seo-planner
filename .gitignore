@@ -34,3 +34,7 @@ Thumbs.db
 *.backup*
 *backup*
 
+# Documentation PDFs (keep local only)
+*.pdf
+documentation_pdfs/
+
