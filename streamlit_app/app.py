@@ -19,8 +19,11 @@ def setting(name):
     value = os.getenv(name, "")
     if not value:
         try:
-            value = st.secrets.get(name, "")
-        except (FileNotFoundError, st.errors.StreamlitSecretNotFoundError):
+            if hasattr(st, "secrets") and name in st.secrets:
+                value = st.secrets[name]
+            elif hasattr(st, "secrets"):
+                value = st.secrets.get(name, "")
+        except Exception:
             pass
     if isinstance(value, str):
         return value.strip().strip('"').strip("'")
@@ -74,7 +77,6 @@ def require_access():
         st.stop()
 
 
-@st.cache_data(ttl=60)
 def active_providers():
     gemini_key = setting("GEMINI_API_KEY")
     groq_key = setting("GROQ_API_KEY")
