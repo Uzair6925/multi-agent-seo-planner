@@ -83,3 +83,57 @@ def test_stage_fallback_recovers_audience_failure(tmp_path):
     assert "Healthcare" in result["audience_description"]
     assert len(result["reader_needs"]) >= 1
     runner.close()
+
+
+def test_safe_parse_json_sanitizes_review_selection_list_and_flaws():
+    from planner.transport import safe_parse_json
+    from planner.notebook_stages import ReviewSelection
+
+    raw_review_json = """
+    {
+        "assessments": [
+            {
+                "location": "heading.0",
+                "verdict": "accurate",
+                "explanation": "",
+                "evidence_ids": ["c1:E1", "c1:E2", "c1:E3", "c1:E4"]
+            },
+            {
+                "location": "heading.1",
+                "verdict": "editorial",
+                "explanation": "Standard structure",
+                "evidence_ids": []
+            }
+        ],
+        "issues": [
+            {
+                "location": "heading.0",
+                "category": "not_supported_custom",
+                "reason": "missing quote",
+                "required_change": "align with quote",
+                "evidence_ids": ["c1:E1"]
+            }
+        ],
+        "limitations": []
+    }
+    """
+    parsed = safe_parse_json(raw_review_json, ReviewSelection)
+    assert isinstance(parsed.assessments, dict)
+    assert "heading.0" in parsed.assessments
+    assert parsed.assessments["heading.0"].verdict == "supported"
+    assert len(parsed.assessments["heading.0"].evidence_ids) <= 3
+    assert len(parsed.limitations) >= 1
+    assert parsed.issues[0].category == "unsupported"
+
+
+def test_stage_fallback_recovers_review_unified_failure(tmp_path):
+    from planner.notebook_stages import ReviewSelection
+    runner = StageRunner("gsk_test_not_real", lambda *args: None, Event())
+    runner.client.chat.completions.create = Mock(return_value=fake_completion("INVALID_CONTENT_NOT_JSON"))
+    context = {"required_locations": ["title", "heading.0", "faq.0"]}
+    result = asyncio.run(runner("review_unified", "Reviewing content plan", "Rules", ReviewSelection, context, tmp_path))
+    assert "assessments" in result
+    assert "title" in result["assessments"]
+    assert "heading.0" in result["assessments"]
+    assert result["assessments"]["title"]["verdict"] == "editorial"
+    runner.close()

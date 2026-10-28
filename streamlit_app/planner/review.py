@@ -193,6 +193,7 @@ async def unified_review_reports(core, reports, request, research, folder):
             issue.evidence_ids = [eid for eid in issue.evidence_ids if eid in catalog]
             if not issue.required_change.strip():
                 issue.required_change = "Revise to align with verified evidence or label as editorial suggestion."
+        review.issues = review.issues[:12]
 
     selected = await core.run_agent(
         "review_unified", "Reviewing content plan", RULES, core.ReviewSelection,
