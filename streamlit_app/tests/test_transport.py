@@ -137,3 +137,48 @@ def test_stage_fallback_recovers_review_unified_failure(tmp_path):
     assert "heading.0" in result["assessments"]
     assert result["assessments"]["title"]["verdict"] == "editorial"
     runner.close()
+
+def test_audience_sanitization_string_and_dict_edge_cases():
+    from planner.transport import safe_parse_json
+    from planner.notebook_stages import AudienceReport
+
+    # 1. assumptions as string, reader_needs as string, reader_questions as list of dicts, output_language lowercase
+    weird_json = """
+    {
+        "audience_report": {
+            "audience_description": "Machine Learning Developers",
+            "audience_basis": "inferred",
+            "assumptions": "None at this stage",
+            "reader_needs": "Practical understanding, deployment advice",
+            "reader_questions": [{"question": "How to deploy?"}, {"question": "What are the costs?"}],
+            "tone": "Technical",
+            "output_language": "roman urdu"
+        }
+    }
+    """
+    parsed = safe_parse_json(weird_json, AudienceReport)
+    assert parsed.audience_description == "Machine Learning Developers"
+    assert parsed.assumptions == ["None at this stage"]
+    assert "Practical understanding" in parsed.reader_needs[0]
+    assert "How to deploy?" in parsed.reader_questions[0]
+    assert parsed.output_language == "Roman Urdu"
+
+
+def test_stage_fallback_with_lowercase_and_various_languages(tmp_path):
+    from planner.notebook_stages import AudienceReport, SEOReport
+    runner = StageRunner("gsk_test_not_real", lambda *args: None, Event())
+    runner.client.chat.completions.create = Mock(return_value=fake_completion("CRASH_TEST"))
+
+    # Test with lowercase "english"
+    ctx1 = {"request": {"topic": "Quantum Computing", "audience": "", "output_language": "english"}}
+    res1 = asyncio.run(runner("audience", "Audience Analyst", "Rules", AudienceReport, ctx1, tmp_path))
+    assert res1["output_language"] == "English"
+    assert "Quantum" in res1["audience_description"]
+
+    # Test with lowercase "roman urdu"
+    ctx2 = {"request": {"topic": "Web Development", "audience": "", "output_language": "roman urdu"}}
+    res2 = asyncio.run(runner("seo", "SEO Strategist", "Rules", SEOReport, ctx2, tmp_path))
+    assert res2["output_language"] == "Roman Urdu"
+    assert len(res2["secondary_keywords"]) >= 2
+    runner.close()
+

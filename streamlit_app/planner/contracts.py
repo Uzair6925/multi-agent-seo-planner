@@ -4,28 +4,28 @@ from typing import Literal
 
 
 class Intake(BaseModel):
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(extra="ignore", str_strip_whitespace=True)
     topic: str = Field(min_length=2, max_length=300)
     audience: str = Field(default="General audience", max_length=500)
     instructions: str = Field(default="", max_length=4000)
 
 
 class Section(BaseModel):
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(extra="ignore", str_strip_whitespace=True)
     heading: str
     body: str = Field(min_length=20)
     chunk_ids: list[str] = Field(default_factory=list)
 
 
 class FAQ(BaseModel):
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(extra="ignore", str_strip_whitespace=True)
     question: str
     answer: str
     chunk_ids: list[str] = Field(default_factory=list)
 
 
 class Article(BaseModel):
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(extra="ignore", str_strip_whitespace=True)
     title: str
     meta_description: str
     introduction: str

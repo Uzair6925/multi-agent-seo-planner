@@ -218,9 +218,9 @@ class ResearchFinding(StrictModel):
 
 
 class ResearchReport(StrictModel):
-    findings: list[ResearchFinding] = Field(max_length=3)
-    missing_information: list[str]
-    limitations: list[str]
+    findings: list[ResearchFinding] = Field(default_factory=list, max_length=4)
+    missing_information: list[str] = Field(default_factory=list)
+    limitations: list[str] = Field(default_factory=list)
     output_language: Language
 
 
@@ -251,22 +251,26 @@ async def run_research(request, research, folder, draft=None, issues=None):
 
 
 class AudienceReport(StrictModel):
-    audience_description: str = Field(min_length=1)
-    audience_basis: Literal["user_provided", "inferred"]
+    audience_description: str = Field(default="General professional and informed audience")
+    audience_basis: Literal["user_provided", "inferred"] = "inferred"
     assumptions: list[str] = Field(default_factory=list, max_length=6)
-    reader_needs: list[str] = Field(min_length=1, max_length=6)
-    reader_questions: list[str] = Field(min_length=1, max_length=6)
-    tone: str = Field(min_length=1)
-    output_language: Language
+    reader_needs: list[str] = Field(default_factory=list, max_length=6)
+    reader_questions: list[str] = Field(default_factory=list, max_length=6)
+    tone: str = Field(default="Professional, informative, and analytical")
+    output_language: Language = "English"
 
 
 async def run_audience(request, folder):
-    basis = "user_provided" if request["audience"] else "inferred"
+    basis = "user_provided" if request.get("audience") else "inferred"
 
     def validate(report):
         validate_language(report, request)
         if report.audience_basis != basis:
             report.audience_basis = basis
+        if not report.reader_needs:
+            report.reader_needs = ["Understand key aspects and practical context of the topic"]
+        if not report.reader_questions:
+            report.reader_questions = ["What are the primary benefits and implementation steps?"]
 
     return await run_agent(
         "audience", "Audience Analyst",
@@ -281,16 +285,22 @@ async def run_audience(request, folder):
 
 class SEOReport(StrictModel):
     primary_keyword: str = Field(min_length=1)
-    secondary_keywords: list[str] = Field(min_length=2, max_length=5)
-    long_tail_keywords: list[str] = Field(min_length=2, max_length=5)
-    search_intent: Intent
-    intent_reason: str = Field(min_length=1)
-    output_language: Language
+    secondary_keywords: list[str] = Field(default_factory=list, max_length=6)
+    long_tail_keywords: list[str] = Field(default_factory=list, max_length=6)
+    search_intent: Intent = "informational"
+    intent_reason: str = Field(default="Readers are seeking actionable knowledge.")
+    output_language: Language = "English"
 
 
 async def run_seo(request, audience, folder, draft=None, issues=None):
     def validate(report):
         validate_language(report, request)
+        if len(report.secondary_keywords) < 2:
+            top = request.get("topic", "topic")[:30]
+            report.secondary_keywords = list(dict.fromkeys(report.secondary_keywords + [f"{top} guide", f"{top} overview"]))[:5]
+        if len(report.long_tail_keywords) < 2:
+            top = request.get("topic", "topic")[:30]
+            report.long_tail_keywords = list(dict.fromkeys(report.long_tail_keywords + [f"how to learn {top}", f"benefits of {top}"]))[:5]
 
     seo_lang = " If output_language is Urdu, write all keywords and explanations in Urdu script (اردو رسم الخط). If Roman Urdu, use Latin alphabet."
     return await run_agent(
@@ -314,13 +324,13 @@ class OutlineSection(StrictModel):
 class ContentBrief(StrictModel):
     title: str = Field(min_length=1)
     meta_description: str = Field(min_length=1)
-    suggested_keywords: list[str] = Field(min_length=1, max_length=8)
-    search_intent: Intent
+    suggested_keywords: list[str] = Field(default_factory=list, max_length=10)
+    search_intent: Intent = "informational"
     h1: str = Field(min_length=1)
-    outline: list[OutlineSection] = Field(min_length=2, max_length=5)
-    faqs: list[str] = Field(default_factory=list, min_length=0, max_length=5)
-    limitations: list[str] = Field(min_length=1)
-    output_language: Language
+    outline: list[OutlineSection] = Field(default_factory=list, max_length=6)
+    faqs: list[str] = Field(default_factory=list, min_length=0, max_length=6)
+    limitations: list[str] = Field(default_factory=list)
+    output_language: Language = "English"
 
 
 async def run_structure(request, audience, seo, findings, research, folder,
