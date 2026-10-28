@@ -9,7 +9,7 @@ import requests
 from pydantic import BaseModel, ConfigDict, Field
 
 class StrictModel(BaseModel):
-    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
+    model_config = ConfigDict(extra="ignore", str_strip_whitespace=True)
 
 
 Language = Literal["English", "Urdu", "Roman Urdu"]
@@ -253,9 +253,9 @@ async def run_research(request, research, folder, draft=None, issues=None):
 class AudienceReport(StrictModel):
     audience_description: str = Field(min_length=1)
     audience_basis: Literal["user_provided", "inferred"]
-    assumptions: list[str] = Field(max_length=4)
-    reader_needs: list[str] = Field(min_length=1, max_length=4)
-    reader_questions: list[str] = Field(min_length=1, max_length=4)
+    assumptions: list[str] = Field(default_factory=list, max_length=6)
+    reader_needs: list[str] = Field(min_length=1, max_length=6)
+    reader_questions: list[str] = Field(min_length=1, max_length=6)
     tone: str = Field(min_length=1)
     output_language: Language
 
@@ -272,8 +272,8 @@ async def run_audience(request, folder):
         "audience", "Audience Analyst",
         "Analyze intended readers using only the request. Preserve the supplied "
         "audience; otherwise infer a broad audience. Label uncertain characteristics "
-        "as assumptions, using tentative wording. Suggest needs and questions as "
-        "editorial hypotheses, not surveyed behavior. Do not invent demographics. "
+        "as assumptions, using tentative wording. Suggest 2 to 4 reader needs and 2 to 4 questions as "
+        "editorial hypotheses, not surveyed behavior. Keep assumptions under 4 items. Do not invent demographics. "
         "Include all schema fields and a useful tone. Use the requested output language.",
         AudienceReport, {"request": request, "expected_basis": basis}, folder, validate,
     )

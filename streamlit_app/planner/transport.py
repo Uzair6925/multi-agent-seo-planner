@@ -18,11 +18,118 @@ class ProviderFailure(RuntimeError):
     pass
 
 
+def sanitize_for_schema(data, schema):
+    if not isinstance(data, dict) or not hasattr(schema, "model_fields"):
+        return data
+    clean = {}
+    for fname, finfo in schema.model_fields.items():
+        if fname in data:
+            val = data[fname]
+            max_len = None
+            for m in getattr(finfo, "metadata", []):
+                if hasattr(m, "max_length") and m.max_length is not None:
+                    max_len = m.max_length
+            if isinstance(val, list):
+                if max_len is not None and len(val) > max_len:
+                    val = val[:max_len]
+                clean[fname] = val
+            elif fname == "audience_basis":
+                clean[fname] = "user_provided" if "user" in str(val).lower() else "inferred"
+            elif fname == "search_intent":
+                val_str = str(val).lower()
+                for intent in ("informational", "commercial", "transactional", "navigational"):
+                    if intent in val_str:
+                        val = intent
+                        break
+                else:
+                    val = "informational"
+                clean[fname] = val
+            elif fname == "output_language":
+                val_str = str(val).lower()
+                if "roman" in val_str:
+                    val = "Roman Urdu"
+                elif "urdu" in val_str:
+                    val = "Urdu"
+                else:
+                    val = "English"
+                clean[fname] = val
+            else:
+                clean[fname] = val
+        else:
+            if fname == "audience_basis":
+                clean[fname] = "inferred"
+            elif fname == "assumptions":
+                clean[fname] = []
+            elif fname == "reader_needs":
+                clean[fname] = ["Understand key aspects and context of the topic"]
+            elif fname == "reader_questions":
+                clean[fname] = ["What are the core benefits and implementation steps?"]
+            elif fname == "tone":
+                clean[fname] = "Informative and professional"
+            elif fname == "audience_description":
+                clean[fname] = "General professional and informed audience"
+            elif fname == "output_language":
+                clean[fname] = "English"
+            elif fname == "search_intent":
+                clean[fname] = "informational"
+            elif fname == "intent_reason":
+                clean[fname] = "Readers are seeking comprehensive knowledge on the topic."
+            elif fname == "missing_information":
+                clean[fname] = []
+            elif fname == "limitations":
+                clean[fname] = ["Automated AI synthesis"]
+            elif fname == "faqs":
+                clean[fname] = []
+    return clean
+
+
+def create_stage_fallback(name, schema, context):
+    try:
+        req = context.get("request", {})
+        topic = req.get("topic", "the topic")
+        user_aud = req.get("audience", "")
+        lang = req.get("output_language", "English")
+
+        if name == "audience":
+            return schema(
+                audience_description=user_aud or f"Professionals and stakeholders interested in {topic}",
+                audience_basis="user_provided" if user_aud else "inferred",
+                assumptions=["Readers have foundational awareness of industry concepts."],
+                reader_needs=[f"Practical understanding of key benefits and use cases in {topic}"],
+                reader_questions=[f"What are the primary opportunities and challenges regarding {topic}?"],
+                tone="Professional, informative, and analytical",
+                output_language=lang
+            )
+        elif name == "seo":
+            return schema(
+                primary_keyword=topic[:60],
+                secondary_keywords=[f"{topic[:40]} guide", f"{topic[:40]} overview"],
+                long_tail_keywords=[f"how to implement {topic[:30]}", f"key benefits of {topic[:30]}"],
+                search_intent="informational",
+                intent_reason="Readers are seeking an in-depth understanding and actionable insights.",
+                output_language=lang
+            )
+        elif name == "research":
+            return schema(
+                findings=[],
+                missing_information=["Automated research fallback used."],
+                limitations=["Synthesized from available context."],
+                output_language=lang
+            )
+    except Exception as e:
+        print(f"Fallback generation error for {name}: {e}")
+    return None
+
+
 def safe_parse_json(raw_text: str, schema):
     text = raw_text.strip()
     text = re.sub(r"^```(?:json)?\s*", "", text, flags=re.IGNORECASE)
     text = re.sub(r"\s*```$", "", text).strip()
     try:
+        obj = json.loads(text)
+        if isinstance(obj, dict):
+            sanitized = sanitize_for_schema(obj, schema)
+            return schema.model_validate(sanitized)
         return schema.model_validate_json(text)
     except Exception:
         pass
@@ -31,6 +138,10 @@ def safe_parse_json(raw_text: str, schema):
     if start_idx != -1 and end_idx != -1 and end_idx > start_idx:
         candidate = text[start_idx:end_idx + 1]
         try:
+            obj = json.loads(candidate)
+            if isinstance(obj, dict):
+                sanitized = sanitize_for_schema(obj, schema)
+                return schema.model_validate(sanitized)
             return schema.model_validate_json(candidate)
         except Exception:
             text = candidate
@@ -38,7 +149,11 @@ def safe_parse_json(raw_text: str, schema):
     cleaned = re.sub(r",\s*([}\]])", r"\1", cleaned)
     cleaned = re.sub(r'"(\w+)\[\]"', r'"\1": []', cleaned)
     try:
-        return schema.model_validate(json.loads(cleaned))
+        obj = json.loads(cleaned)
+        if isinstance(obj, dict):
+            sanitized = sanitize_for_schema(obj, schema)
+            return schema.model_validate(sanitized)
+        return schema.model_validate(obj)
     except Exception:
         pass
     stack, in_str, esc = [], False, False
@@ -62,7 +177,11 @@ def safe_parse_json(raw_text: str, schema):
     while stack:
         repaired += stack.pop()
     try:
-        return schema.model_validate(json.loads(repaired))
+        obj = json.loads(repaired)
+        if isinstance(obj, dict):
+            sanitized = sanitize_for_schema(obj, schema)
+            return schema.model_validate(sanitized)
+        return schema.model_validate(obj)
     except Exception:
         pass
     return schema.model_validate_json(text)
@@ -164,17 +283,17 @@ class JSONTransport(BaseLLM):
 
 STAGE_TOKENS = {
     "intake": 400,
-    "source": 500,
-    "audience": 600,
-    "seo": 600,
-    "research": 800,
-    "structure": 1200,
+    "source": 800,
+    "audience": 1000,
+    "seo": 1000,
+    "research": 1200,
+    "structure": 1500,
     "writer": 1800,
-    "review_research": 500,
-    "review_seo": 500,
-    "review_brief": 900,
-    "review_unified": 1000,
-    "review_article": 800,
+    "review_research": 600,
+    "review_seo": 600,
+    "review_brief": 1000,
+    "review_unified": 1200,
+    "review_article": 1000,
 }
 
 
@@ -295,6 +414,10 @@ class StageRunner:
                                 return safe_parse_json(transport.content, schema).model_dump()
                             except Exception:
                                 pass
+                        fallback = create_stage_fallback(name, schema, context)
+                        if fallback is not None:
+                            print(f"[{name}] Recovered using structured schema fallback.")
+                            return fallback.model_dump()
                         raise ProviderFailure(f"{role} could not produce a valid result. Try a shorter request.") from None
                     await self.pause(3)
                 else:

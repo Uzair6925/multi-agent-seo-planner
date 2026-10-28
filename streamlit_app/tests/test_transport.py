@@ -46,3 +46,40 @@ def test_transport_never_makes_hidden_second_request():
     else:
         raise AssertionError("A second provider call was allowed")
     assert client.chat.completions.create.call_count == 1
+
+
+def test_safe_parse_json_sanitizes_excess_lists_and_extra_fields():
+    from planner.transport import safe_parse_json
+    from planner.notebook_stages import AudienceReport
+
+    raw_excessive_json = """
+    {
+        "audience_description": "Healthcare executives and clinical IT administrators",
+        "audience_basis": "inferred from clinical prompt",
+        "assumptions": ["A1", "A2", "A3", "A4", "A5", "A6", "A7"],
+        "reader_needs": ["Need 1", "Need 2", "Need 3", "Need 4", "Need 5", "Need 6", "Need 7"],
+        "reader_questions": ["Q1", "Q2", "Q3", "Q4", "Q5", "Q6", "Q7"],
+        "tone": "Professional and analytical",
+        "output_language": "English",
+        "unexpected_hallucinated_field": "This should be ignored safely"
+    }
+    """
+    parsed = safe_parse_json(raw_excessive_json, AudienceReport)
+    assert parsed.audience_basis == "inferred"
+    assert len(parsed.assumptions) <= 6
+    assert len(parsed.reader_needs) <= 6
+    assert len(parsed.reader_questions) <= 6
+    assert parsed.audience_description.startswith("Healthcare")
+
+
+def test_stage_fallback_recovers_audience_failure(tmp_path):
+    from planner.notebook_stages import AudienceReport
+    runner = StageRunner("gsk_test_not_real", lambda *args: None, Event())
+    # Mock completion to return invalid broken text
+    runner.client.chat.completions.create = Mock(return_value=fake_completion("NOT_JSON_AT_ALL"))
+    context = {"request": {"topic": "Edge AI in Healthcare", "audience": "", "output_language": "English"}}
+    result = asyncio.run(runner("audience", "Audience Analyst", "Rules", AudienceReport, context, tmp_path))
+    assert result["audience_basis"] == "inferred"
+    assert "Healthcare" in result["audience_description"]
+    assert len(result["reader_needs"]) >= 1
+    runner.close()
